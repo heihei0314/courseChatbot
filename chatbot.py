@@ -164,11 +164,26 @@ def tokenThreshold(thread):
       thread = tokenThreshold(thread)
   return thread
 
+#verify the response is correct or not
+def verification(response, dataString, seek_dataString):
+    chat_completion = client.chat.completions.create(
+        model = 'gpt-35-turbo',
+        temperature = 0,
+        messages = [
+            {"role": "system", "content": "Please check the correctness of the user's query. If the query is correct, simply return 'True'. If the query is incorrect, revise the mistake and return the corrected query only, no other words needed. The correct infomation is as follow: \\n"+dataString+seek_dataString},
+            {"role": "user", "content": response}
+      ]
+    )
+    #If the uery is fully correct, simply return 'True'. If not, return 'False'. 
+    result = chat_completion.choices[0].message.content
+    return result
+
 def conversation(thread, query,user_dataSource):
     if user_dataSource!='':
         dataString = get_dataString(user_dataSource)
         user_cat = user_cat_open+dataString+user_cat_close
         thread[0]['content'] = context + user_cat
+    seek_dataString = ""
     seek_dataSource = search_by_classifier(query)
     if seek_dataSource != user_dataSource:
         seek_dataString = get_dataString(seek_dataSource)
@@ -181,7 +196,11 @@ def conversation(thread, query,user_dataSource):
         messages = thread
     )
     response = chat_completion.choices[0].message.content
-    # return the response
+    verified_response = verification(response, dataString, seek_dataString)
+    if  verified_response == "True":
+      return response
+    else:  
+      response = verified_response
     return response
 
 answer = conversation(thread, user_input,user_dataSource)
