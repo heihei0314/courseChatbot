@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 <script>
-		apiURL = 'https://script.google.com/macros/s/AKfycbw23Aes2MxC2KHNcfmH90KogXRDabOyrwQ_Cdqg9VrDkTs7GM-t56w5ryTZ_o1o2mrq/exec';
+		apiURL = '';
 		let uid='';
 		let action='setLog';
 		let datetime='';
