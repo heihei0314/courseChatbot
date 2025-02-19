@@ -354,7 +354,7 @@
         </div>
     </div>
     <script>
-		const apiURL = 'https://script.google.com/macros/s/AKfycbw23Aes2MxC2KHNcfmH90KogXRDabOyrwQ_Cdqg9VrDkTs7GM-t56w5ryTZ_o1o2mrq/exec';
+		const apiURL = '';
 		let action = 'setChallengerLog';
 		let messageCount = 0;
 		let token=0;
