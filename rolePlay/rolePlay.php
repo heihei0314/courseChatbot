@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/core.min.js'></script>
 
 <script>
 		let uid='';
-		let datetime='';
+        let thread_name='';
+		let create_datetime='';
 		let web_log_time = '';
 		
 		function login(user){
 			uid = user;
 			//console.log("here is iframe");
-			datetime=new Date(Date.now()).toLocaleString();
-			web_log_time=datetime;
+			create_datetime=new Date(Date.now()).toLocaleString();
+			web_log_time=create_datetime;
+            thread_name=create_datetime;
 		}
 </script>
 <?php 
@@ -22,6 +25,7 @@
 	else{
 		echo "<script> login('test'); </script>";
 	}
+
 ?>
 <html lang="en">
 <head>
@@ -141,7 +145,7 @@
             border-radius: 12px;
             padding-left: 15px;
             padding-right: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 0px;
 			width:calc(100% - 30px);
         }
         #user-input {
@@ -189,7 +193,74 @@
         .export-btn{
             background-color: var(--clear-chat-color);
         }
+        
+        .topic-container {
+            position: relative;
+            margin-bottom: 10px;
+        }
+        .custom-dots {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2em; /* Adjust this value to increase/decrease vertical gap */
+            padding: 2px 0;
+        }
+
+        .custom-dots span {
+            width: 0.3em;
+            height: 0.3em;
+            background-color: white;
+            border-radius: 50%;
+            display: block;
+        }
+        .dot-btn{
+            position: absolute;
+            right: 1em;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: white;
+            padding: 5px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .topic-container:hover .dot-btn {
+            opacity: 1;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 1000;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-menu button {
+            display: block;
+            width: 100%;
+            padding: 8px 16px;
+            background: none;
+            border: none;
+            text-align: left;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        .dropdown-menu button:hover {
+            background: #f5f5f5;
+        }
+
         .topic-btn {
+            padding-right: 35px !important;
             display: block;
             width: 100%;
             padding: 12px;
@@ -238,7 +309,7 @@
         .user-message {
             background-color: var(--message-bg-user);
             margin-left: auto;
-            text-align: right;
+            text-align: left;
             border-bottom-right-radius: 0;
         }
         .bot-message {
@@ -276,8 +347,9 @@
         }
 
         #typing-indicator {
-            padding: 10px;
-            display: none;
+            padding: 2.5px;
+            display: block;
+			visibility:hidden;
             animation: blink 1s infinite;
         }
         @keyframes blink {
@@ -354,14 +426,14 @@
         </div>
     </div>
     <script>
-		const apiURL = '';
+		const apiURL = 'https://script.google.com/macros/s/AKfycbw23Aes2MxC2KHNcfmH90KogXRDabOyrwQ_Cdqg9VrDkTs7GM-t56w5ryTZ_o1o2mrq/exec';
 		let action = 'setChallengerLog';
 		let messageCount = 0;
 		let token=0;
 		sendLog(messageCount,token, action);
 		
 		var open_new_chat = 1;
-		var history_json;
+		var thread_json;
 		
 		const chatMessages = document.getElementById('chat-messages');
         const userInput = document.getElementById('user-message');
@@ -377,7 +449,7 @@
             "assistant":[]
         } 
         // Add welcome message
-        addMessage('system', "<strong>Welcome to 'The Challenger' !</strong> 🎭<br>In this roleplay, you'll practice handling challenging questions from students in your tutorials. I'll take on the role of a student with specific characteristics, and you'll respond as their teaching assistant.<br>We'll continue until we reach a natural stopping point, or you explicitly type '<strong>stop</strong>'. Once the session ends, I'll provide you with constructive feedback on your responses, including insights from both a student’s and an educator’s perspective.<p><strong>Before we begin, please provide:</strong><br>📚 Your Teaching Topic: [The specific concept you'll explain]<br>👥 Student Level: [e.g., Year 1 Undergraduate]<br>🎭 Choose Your Challenger:<br>A. The Skeptic – Questions everything, needs evidence and real-world relevance.<br>B. The Confused-but-Eager – Trying hard but missing key concepts, wants to understand but struggles.<br>C. The Debater – Challenges assumptions, pushes for deeper analysis.</p><p><strong>Please respond with:</strong><br>Topic: [your topic]<br>Student Level: [your student level]<br>Challenger: The Skeptic / The Confused-but-Eager / The Debater (Choose one)");
+        addMessage('system', "<strong>Welcome to 'The Challenger' !</strong> 🎭<br>You’ve just finished running a tutorial, and a student (me) stayed behind to ask more questions. In this interactive role-play, you’ll practice how to handle students’ follow-up inquiries. <strong>I</strong> will take on the role of a <strong>student</strong> with specific characteristics, and <strong>you</strong> will respond as the <strong>teaching assistant</strong><br>We’ll go back and forth with questions and answers, just like a real tutorial session. We will stop when we reach a natural stopping point or when you type “<strong>stop</strong>”. Once the session ends, I’ll give you two-part feedback—first from the student’s perspective, then from an expert educator’s viewpoint.<p><strong>Before we begin, please provide</strong>:<br>📚 Your Teaching Topic: [The specific concept you'll explain]<br>👥 Student Level: [e.g., Year 1 Undergraduate]<br> 🎭 Choose Your Challenger:<br>A. The Skeptic – Challenges practical relevance, demands real-world proof.<br>B. The Confused-but-Eager – Craves step-by-step clarity, easily overwhelmed.<br>C. The Debater – Pokes holes in assumptions, pushes for deeper analysis.<br>D. The Ordinary – Focuses on exams/homework, wants minimal theory.</p><p><strong>Please respond with:</strong><br>Topic: [your topic]<br> Student Level: [your student level]<br>Challenger: The Skeptic / The Confused-but-Eager / The Debater/The Ordinary (Choose one)</p>");
 
 		//console.log(uid, datetime);
 		getHistory();
@@ -397,16 +469,46 @@
 				type: "GET",
 				url: apiURL,
 				data: query,
-				dataType: "JSON",			
-				success: function(response){
-					console.log(response);
-				},
-				error: function(response){
-					console.log(response);
-				}
+				dataType: "JSON",		
+				//success: function(response){
+					//return;
+				//},
+				//error: function(response){
+				//	console.log(response);
+				//}
 			});
 		}
-		
+
+		function editLog(old_name, new_name, editAction){
+			var data = {
+				uid: uid,
+				new_thread_name: new_name,
+                thread_name: old_name,
+                action:editAction
+			};
+            console.log(data)
+			//$.post("https://pdev6800z-ai.ust.hk/chatbot/rolePlay/editHistory.php", data);
+            $.post("editHistory.php", data).done(function() {
+                console.log(editAction);
+				if (editAction=='rename'){
+                    open_new_chat = 1;
+                    getHistory();
+                    thread_name=new_name;
+					//console.log("here");
+                }
+                if (editAction=='delete'){
+                    if (old_name == thread_name){                    
+                        open_new_chat = 4;
+						getHistory();                        
+                    }
+                    else {
+                        open_new_chat = 1;
+                    }
+                    
+                }
+            });            
+		}
+
 		function createLog(role,msg){
 			msg = msg.replace(/"/g, '&quot;');
 			const history = '{"'+role+'":"'+msg+'"}';
@@ -414,10 +516,13 @@
 			var data = {
 				uid: uid,
 				history: json_history,
-				datetime: datetime
+				create_datetime: create_datetime,
+                thread_name: thread_name
 			};
-			$.post("https://pdev6800z-ai.ust.hk/chatbot/rolePlay/writeHistory.php", data);
-			getHistory();
+			$.post("https://pdev6800z-ai.ust.hk/chatbot/rolePlay/writeHistory.php", data)
+                .done(function(  ) {
+                    getHistory();
+                });
 		}
 		function getHistory(){
 			const xmlhttp = new XMLHttpRequest();        
@@ -427,12 +532,33 @@
 			//xmlhttp.setRequestHeader('Expires', '0');		            
 			xmlhttp.onload = function() {
 				if (this.readyState == 4 && this.status == 200) {
-					history_json = JSON.parse(this.responseText); 
-					//console.log(history_json); 
+					thread_json = JSON.parse(this.responseText); 
+                    console.log("open_new_chat: "+open_new_chat); 	
+                    console.log(thread_json); 	
+					
 					if(open_new_chat==1||open_new_chat==3){
 						setHistory();
 					}					
 					if(open_new_chat==2){
+						setHistory();
+						setChat();
+					}			
+					if(open_new_chat==4){
+						if(thread_json.length>0){
+							console.log(thread_json.keys(obj)[0]);
+							thread_name=thread_json.keys(obj)[0];
+						}
+						else{
+							clear();
+							create_datetime=new Date(Date.now()).toLocaleString();
+							thread_name=create_datetime;
+							clear();
+							//console.log(thread_name);
+							addMessage('system', 'Chat cleared. Let’s start a new challenge! Pick another “Challenger” to explore how to adapt your strategies or practice with the same “Challenger ”to see how to do even better!<br>A. The Skeptic – Challenges practical relevance, demands real-world proof.<br>B. The Confused-but-Eager – Craves step-by-step clarity, easily overwhelmed.<br>C. The Debater – Pokes holes in assumptions, pushes for deeper analysis.<br>D. The Ordinary – Focuses on exams/homework, wants minimal theory.<p> <strong>Please respond with:</strong><br>📚 Topic: [your topic]<br>👥 Student Level: [your student level]<br>🎭 Challenger: The Skeptic / The Confused-but-Eager / The Debater/The Ordinary (Choose one)</p>');
+							
+							const topicBtns = document.querySelectorAll('.topic-btn');
+							topicBtns.forEach(b => b.classList.remove('active'));
+						}
 						setHistory();
 						setChat();
 					}
@@ -444,31 +570,52 @@
 		function setHistory(){
 			var chatHistoryText = "";
 			
-			for (let chat in history_json){
+			for (let chat in thread_json){
 				//console.log(chat);
-				chatHistoryText += '<button class="topic-btn" data-topic="'+chat+'" id="'+chat+'" >'+chat+'</button>';
+                chatHistoryText += `
+                <div class="topic-container">
+                    <button class="topic-btn" data-topic="${chat}" id="${chat}">${chat}</button>
+                    <button class="dot-btn">
+                        <div class="custom-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </button>
+                    <div class="dropdown-menu">
+                        <button class="rename-btn" value="${chat}">Rename</button>
+                        <button class="delete-btn" value="${chat}">Delete</button>
+                    </div>
+                </div>`;
+    
 			}
 			document.getElementById("chatHistory").innerHTML = chatHistoryText;
 			topicBtnsEvent();
+            setupMenuEvents();
+			open_new_chat=0;
 		}		
 		function setChat(){
-			if(document.getElementById(datetime)){
-				document.getElementById(datetime).classList.add('active');
+			if(document.getElementById(thread_name)){
+				document.getElementById(thread_name).classList.add('active');
 			}
-			for(var chat_object in history_json[datetime]){
-				var msg_object = history_json[datetime][chat_object];
-				//console.log(history_json[datetime][chat_object]);
-				var role = Object.keys(msg_object)[0];
-				var new_msg = msg_object[role];
-				//console.log(role,new_msg);
-				addMessage(role, new_msg);
-				if(role=='user'){
-					thread.user.push(new_msg);
-				}
-				else{
-					thread.assistant.push(new_msg);
-				}
-			}
+            if (thread_json[thread_name]){
+                history_json = thread_json[thread_name]['history'];
+                console.log(history_json); 
+                for(var chat_object in history_json){
+                    var msg_object = history_json[chat_object];
+                    //console.log(history_json[datetime][chat_object]);
+                    var role = Object.keys(msg_object)[0];
+                    var new_msg = msg_object[role];
+                    //console.log(role,new_msg);
+                    addMessage(role, new_msg);
+                    if(role=='user'){
+                        thread.user.push(new_msg);
+                    }
+                    else{
+                        thread.assistant.push(new_msg);
+                    }
+                }
+            }
 		}
 
 		function clear(){
@@ -515,7 +662,7 @@
             messageElement.classList.add('message', `${sender}-message`);
             messageElement.innerHTML = message;
             chatMessages.appendChild(messageElement);
-			messageElement.scrollIntoView(false);	
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
         function addFeedback(messageElement) {
@@ -537,8 +684,8 @@
 
         function simulateBotResponse(message, addFeedbackFlag) {
             setTimeout(() => {
-                typingIndicator.style.display = 'none';
-                
+                typingIndicator.style.visibility = 'hidden';
+                chatMessages.scrollTop = chatMessages.scrollHeight;
                 addMessage('bot', message);
                 if (addFeedbackFlag) {
                     addFeedback(chatMessages.lastElementChild);
@@ -553,14 +700,26 @@
         }
 
         function generateResponse (message) {
-            typingIndicator.style.display = 'block';
+            typingIndicator.style.visibility = 'visible';
             thread.user.push(message);
             const xhttp = new XMLHttpRequest();
             xhttp.open("POST", "https://pdev6800z-ai.ust.hk/chatbot/rolePlay/rolePlay_adaptor.php");
 			
             xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
             xhttp.onload = function() {
-                response = this.responseText.split(/({token})/)
+				let data = JSON.parse(this.responseText);
+				console.log(data);
+				if (data.audio) {
+					let audio = new Audio(data.audio); // Create Audio object with file path
+					audio.play().catch(error => {
+						console.error('Error playing audio:', error);
+					});
+				} else {
+					console.warn('No audio file specified in response');
+				}
+                response = data.output.split(/({token})/)
+				
+				/*response = this.responseText.split(/({token})/)*/
 				//console.log(response);
 				bot_response = response[0];
 				thread.assistant.push(bot_response);
@@ -568,10 +727,10 @@
 				createLog("bot",reformMessage(bot_response));
                 //console.log(thread)
 				response[2] = response[2].replace(/\n/g, ''); // Line breaks
-				token += parseInt(response[2]);
+				token += parseInt(response[2]);				
 				sendLog(messageCount,token, action);
             }
-			console.log(thread);
+			//console.log(thread);
             xhttp.send("thread="+JSON.stringify(thread));
 			//return true
         };
@@ -585,10 +744,12 @@
         });
 		
         clearChatBtn.addEventListener('click', () => {
-			datetime=new Date(Date.now()).toLocaleString();
+			create_datetime=new Date(Date.now()).toLocaleString();
+            thread_name=create_datetime;
 			clear();
 			open_new_chat = 3;
-			addMessage('system', 'Chat cleared. To start over, please respond with:<br>Topic: [your topic]<br>Student Level: [your student level]<br>Challenger: The Skeptic / The Confused-but-Eager / The Debater (Choose one)');
+            //console.log(thread_name);
+			addMessage('system', 'Chat cleared. Let’s start a new challenge! Pick another “Challenger” to explore how to adapt your strategies or practice with the same “Challenger ”to see how to do even better!<br>A. The Skeptic – Challenges practical relevance, demands real-world proof.<br>B. The Confused-but-Eager – Craves step-by-step clarity, easily overwhelmed.<br>C. The Debater – Pokes holes in assumptions, pushes for deeper analysis.<br>D. The Ordinary – Focuses on exams/homework, wants minimal theory.<p> <strong>Please respond with:</strong><br>📚 Topic: [your topic]<br>👥 Student Level: [your student level]<br>🎭 Challenger: The Skeptic / The Confused-but-Eager / The Debater/The Ordinary (Choose one)</p>');
 			
 			const topicBtns = document.querySelectorAll('.topic-btn');
 			topicBtns.forEach(b => b.classList.remove('active'));
@@ -596,7 +757,7 @@
         });
 
         exportChatBtn.addEventListener('click', () => {
-            generateHTML(datetime);
+            generateHTML(thread_name);
 			
         });
 
@@ -653,13 +814,67 @@
 					btn.classList.add('active');
 					clear();
 					addMessage('system', `Switched to chat: ${btn.innerHTML}`);
-					datetime = btn.innerHTML;
+					thread_name = btn.innerHTML;
 					getHistory();
 					//console.log(history_json[new_chat]);
 				});
 			});
 		}
+        
+        function setupMenuEvents() {
+            const dotBtns = document.querySelectorAll('.dot-btn');
+    
+            // Close all dropdown menus when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.dot-btn')) {
+                    document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                        menu.classList.remove('show');
+                    });
+                }
+            });
 
+            dotBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const menu = btn.nextElementSibling;
+            
+                    // Close all other menus
+                    document.querySelectorAll('.dropdown-menu').forEach(otherMenu => {
+                        if (otherMenu !== menu) {
+                            otherMenu.classList.remove('show');
+                        }
+                    });
+            
+                    menu.classList.toggle('show');
+                });
+
+                const menu = btn.nextElementSibling;
+                const renameBtn = menu.querySelector('.rename-btn');
+                const deleteBtn = menu.querySelector('.delete-btn');
+                const topicBtn = btn.previousElementSibling;
+
+                renameBtn.addEventListener('click', () => {
+                    const newName = prompt('Enter new name:', topicBtn.textContent);
+                    if(newName != null && newName != ""){        
+					    editLog(topicBtn.textContent, newName, 'rename');
+                    }           
+                    menu.classList.remove('show');
+                    
+                });
+
+                deleteBtn.addEventListener('click', () => {
+                    if (confirm('Are you sure you want to delete this chat?')) {
+                        // Here you would add the logic to delete the chat from your history_json
+                        // and update the server
+                        editLog(topicBtn.textContent, '', 'delete');
+
+                    }
+                    menu.classList.remove('show');
+                });
+            });
+}
+
+        //mobile sidebar setting
         const sidebarToggle = document.getElementById('sidebar-toggle');
         const sidebar = document.getElementById('sidebar');
         const icon = sidebarToggle.querySelector('i');
@@ -694,6 +909,9 @@
                 icon.classList.add('fa-bars');
             }
         });
+
+
+        
     </script>
 </body>
 </html>
